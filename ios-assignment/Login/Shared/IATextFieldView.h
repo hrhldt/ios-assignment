@@ -14,6 +14,7 @@ IB_DESIGNABLE
 - (void)setAttributedPlaceholder:(NSString *)thePlaceholder;
 - (void)setAsPasswordTextField;
 - (void)setAsEmailTextField;
+- (void)resetTextField;
 
 @property (weak, nonatomic) IBOutlet UIImageView *icon;
 

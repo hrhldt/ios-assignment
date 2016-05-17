@@ -61,6 +61,13 @@
      attributes:@{NSForegroundColorAttributeName:color, NSFontAttributeName:[UIFont boldSystemFontOfSize:16]}];
 }
 
+- (void)resetTextField {
+    [self.inputField resignFirstResponder];
+    self.icon.tintColor = [UIColor colorWithWhite:1 alpha:0.3];
+    self.sepLine.backgroundColor = [UIColor colorWithWhite:1 alpha:0.3];
+    self.inputField.text = @"";
+}
+
 - (UIView *)loadViewFromNib {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 
@@ -90,6 +97,11 @@
         self.icon.tintColor = [UIColor colorWithWhite:1 alpha:0.3];
         self.sepLine.backgroundColor = [UIColor colorWithWhite:1 alpha:0.3];
     }
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return NO;
 }
 
 #pragma mark - Actions

@@ -30,6 +30,7 @@
     // Do any additional setup after loading the view, typically from a nib.
 
     [self initView];
+    [self registerForKeyboardNotifications];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -38,6 +39,58 @@
 }
 
 #pragma mark - View setup
+
+- (void)registerForKeyboardNotifications
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
+}
+
+- (void)keyboardWasShown:(NSNotification*)aNotification
+{
+    NSDictionary* info = [aNotification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+
+//    UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
+    NSNumber* duration = info[UIKeyboardAnimationDurationUserInfoKey];
+
+    [UIView animateWithDuration:duration.doubleValue animations:^{
+        self.view.frame = CGRectMake(0, -kbSize.height, self.view.frame.size.width, self.view.frame.size.height);
+    }];
+
+//    scrollView.contentInset = contentInsets;
+//    scrollView.scrollIndicatorInsets = contentInsets;
+
+    // If active text field is hidden by keyboard, scroll it so it's visible
+    // Your app might not need or want this behavior.
+//    CGRect aRect = self.view.frame;
+//    aRect.size.height -= kbSize.height;
+//    if (!CGRectContainsPoint(aRect, self.passwordTextFieldView.inputField.frame.origin) ) {
+//
+//        [self.scrollView scrollRectToVisible:activeField.frame animated:YES];
+//    }
+}
+
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification
+{
+//    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+//    scrollView.contentInset = contentInsets;
+//    scrollView.scrollIndicatorInsets = contentInsets;
+    NSDictionary* info = [aNotification userInfo];
+    //CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+
+    NSNumber* duration = info[UIKeyboardAnimationDurationUserInfoKey];
+
+    [UIView animateWithDuration:duration.doubleValue animations:^{
+        self.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    }];
+}
 
 - (void)initView {
     [self.emailTextFieldView setAttributedPlaceholder:NSLocalizedString(@"Username", @"loginEmailPlaceholder")];
@@ -57,6 +110,9 @@
     UIAlertView *alert = [[UIAlertView alloc] init];
     NSString *email = self.emailTextFieldView.inputField.text;
     NSString *password = self.passwordTextFieldView.inputField.text;
+
+    [self.emailTextFieldView.inputField resignFirstResponder];
+    [self.passwordTextFieldView.inputField resignFirstResponder];
 
     if ( email.length == 0 ) {
         alert.message = @"Email field is empty";
@@ -106,6 +162,7 @@
     self.emailTextFieldView.inputField.text = @"";
 
     [self.emailTextFieldView.inputField becomeFirstResponder];
+    [self.passwordTextFieldView resetTextField];
 }
 
 #pragma mark - Networking 
